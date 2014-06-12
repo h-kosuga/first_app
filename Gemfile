@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 		
 gem 'rails', '4.1.1'
+gem 'heroku-api'
+gem 'rb-readline'
 
 gem 'bootstrap-sass','2.3.2.0'
 gem 'sprockets','2.11.0'
