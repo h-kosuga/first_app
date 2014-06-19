@@ -20,6 +20,7 @@ group :test do
 	gem 'selenium-webdriver'
 	gem 'capybara'
 	gem 'factory_girl_rails', '4.2.1'
+        gem 'database_cleaner', github: 'bmabey/database_cleaner'
 end
 
 gem 'therubyracer',  platforms: :ruby
