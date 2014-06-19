@@ -5,6 +5,7 @@ describe 'User pages' do
 
   describe "index" do
     let(:user) { FactoryGirl.create(:user) }
+
     before do
       sign_in user
       visit users_path
@@ -21,11 +22,33 @@ describe 'User pages' do
       it { should have_selector('div.pagination') }
 
       it "should list each user" do
-        User.paginate(page: 1).each do |user|
+        User.paginate(page: 1)
+        User.all.each do |user|
           expect(page).to have_selector('li', text: user.name)
         end
       end
     end
+
+    describe "delete links" do
+
+      it { should_not have_link('delete') }
+
+      describe "as an admin user" do
+        let(:admin) { FactoryGirl.create(:admin) }
+        before do
+          sign_in admin
+          visit users_path
+        end
+
+        it { should have_link('delete', href: user_path(User.first)) }
+        it "should be able to delete another user" do
+          expect do
+            click_link('delete', match: :first)
+            end.to change(User, :count).by(-1)
+          end
+          it { should_not have_link('delete', hreh:user_path(admin)) }
+        end
+      end
   end
 
   describe 'profile page' do
@@ -65,6 +88,7 @@ describe 'User pages' do
 
        it 'should create a user' do
          expect { click_button submit }.to change(User, :count).by(1)
+         end
        end
 
        describe 'after saving the user' do
@@ -74,7 +98,7 @@ describe 'User pages' do
          it { should have_link('Sign out') }
          it { should have_title(user.name) }
          it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-       end
+       
      end
 
      describe "edit" do
