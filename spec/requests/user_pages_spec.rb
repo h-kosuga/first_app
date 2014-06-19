@@ -5,29 +5,28 @@ describe 'User pages' do
 
   describe "index" do
     let(:user) { FactoryGirl.create(:user) }
-
-    before do
+    before(:each) do
       sign_in user
       visit users_path
     end
 
-    it{should have_title('All users')}
-    it{should have_content('All users')}
+    it { should have_title('All users') }
+    it { should have_content('All users') }
 
     describe "pagination" do
 
       before(:all) { 30.times { FactoryGirl.create(:user) } }
-      after(:all) { User.delete_all }
+      after(:all)  { User.delete_all }
 
       it { should have_selector('div.pagination') }
 
       it "should list each user" do
-        User.paginate(page: 1)
-        User.all.each do |user|
+        User.paginate(page: 1).each do |user|
           expect(page).to have_selector('li', text: user.name)
         end
       end
     end
+
 
     describe "delete links" do
 
@@ -44,12 +43,13 @@ describe 'User pages' do
         it "should be able to delete another user" do
           expect do
             click_link('delete', match: :first)
-            end.to change(User, :count).by(-1)
-          end
-          it { should_not have_link('delete', hreh:user_path(admin)) }
+          end.to change(User, :count).by(-1)
         end
+        it { should_not have_link('delete', href: user_path(admin)) }
       end
+    end
   end
+
 
   describe 'profile page' do
     let(:user) { FactoryGirl.create(:user) }
@@ -58,57 +58,53 @@ describe 'User pages' do
     it { should have_content(user.name) }
     it { should have_title(user.name) }
   end
-  describe 'signup' do
 
-     before { visit signup_path }
+  describe 'signup page' do
 
-     let(:submit) { 'Create my account' }
+    before { visit signup_path }
 
-     describe 'with invalid information' do
-       it 'should not create a user' do
-         expect { click_button submit }.not_to change(User, :count)
-       end
+    let(:submit) { 'Create my account' }
 
-       describe 'after submission' do
-           before { click_button submit }
+    describe 'with invalid information' do
+      it 'should not create a user' do
+        expect { click_button submit }.not_to change(User, :count)
+      end
 
-           it { should have_title('Sign up') }
-           it { should have_content('error') }
-         end
+      describe 'after submission' do
+        before { click_button submit }
 
-     end
+        it { should have_title('Sign up') }
+        it { should have_content('error') }
+      end
+    end
 
-     describe 'with valid information' do
-       before do
-         fill_in 'Name',         with: 'Example User'
-         fill_in 'Email',        with: 'user@example.com'
-         fill_in 'Password',     with: 'foobar'
-         fill_in 'Confirmation', with: 'foobar'
-       end
+    describe 'with valid information' do
+      before do
+        fill_in 'Name',         with: 'Example User'
+        fill_in 'Email',        with: 'user@example.com'
+        fill_in 'Password',     with: 'foobar'
+        fill_in 'Confirmation', with: 'foobar'
+      end
 
-       it 'should create a user' do
-         expect { click_button submit }.to change(User, :count).by(1)
-         end
-       end
+      it 'should create a user' do
+        expect { click_button submit }.to change(User, :count).by(1)
+      end
 
-       describe 'after saving the user' do
-         before { click_button submit }
-         let(:user) { User.find_by(email: 'user@example.com') }
+      describe 'after saving the user' do
+        before { click_button submit }
+        let(:user) { User.find_by(email: 'user@example.com') }
 
-         it { should have_link('Sign out') }
-         it { should have_title(user.name) }
-         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-       
-     end
+        it { should have_link('Sign out') }
+        it { should have_title(user.name) }
+        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+      end
 
-     describe "edit" do
+      describe "edit page" do
         let(:user) { FactoryGirl.create(:user) }
         before do
           sign_in user
           visit edit_user_path(user)
-
-      end
-
+        end
 
         describe "page" do
           it{should have_content("Update your profile")}
@@ -120,7 +116,7 @@ describe 'User pages' do
           before{click_button "Save changes"}
 
           it{should have_content('error')}
-        end 
+        end
 
         describe "with valid information" do
           let(:new_name){"New Name"}
@@ -132,7 +128,6 @@ describe 'User pages' do
             fill_in "Confirm Password", with: user.password
             click_button "Save changes"
           end
-
           it{should have_title(new_name)}
           it{should have_selector('div.alert.alert-success')}
           it{should have_link('Sign out', href: signout_path)}
@@ -140,5 +135,6 @@ describe 'User pages' do
           specify{expect(user.reload.email).to eq new_email}
         end
       end
-   end
+    end
+  end
 end
