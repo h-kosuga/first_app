@@ -5,6 +5,7 @@ describe 'Authentication' do
   subject { page }
 
   describe 'signin page' do
+    #include SessionsHelper
     before { visit signin_path }
 
  		it { should have_content('Sign in') }
